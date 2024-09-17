@@ -13,7 +13,51 @@
 <body>
   <main id="root">
     <button type="button">Inserir Form</button>
+    <button type="button">Inserir Ta</button>
   </main>
+
+  <template id="table_items_template">
+    <style>
+      .nada div {
+        width: 100%;
+        text-align: center;
+      }
+
+      .nada p {
+        margin: 0;
+      }
+
+      tbody > .nada:not(:only-of-type) {
+        display: none;
+      }
+    </style>
+
+    <section>
+      <h3>Abastecimentos por data</h3>
+
+      <div class="table-items">
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Qtde.</th>
+              <th>Preço</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="nada">
+              <td colspan="100%">
+                <div>
+                  <kbd>Atenção!</kbd>
+                  <p>Nenhum abastecimento cadastrado</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </template>
 
   <template id="form_item_template">
     <style>

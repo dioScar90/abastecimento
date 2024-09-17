@@ -1,17 +1,6 @@
-function getTodayAsyyyyMMdd() {
-  const date = new Date()
-  return date.toISOString().split('T')[0]
-}
+import { getCloneByTemplateId, getTodayAsyyyyMMdd, setNewItemInStorage } from "./utils.js"
 
-function getFragmentByTemplateId(id) {
-  const template = document.querySelector(id)
-
-  if (!(template instanceof HTMLTemplateElement)) {
-    return null
-  }
-
-  return template.content.cloneNode(true)
-}
+export const MODAL_ABASTECIMENTO_NAME = 'modal-abastecimento'
 
 function setValueAttribute(e) {
   // apply regex
@@ -23,7 +12,17 @@ function handleSubmit(e) {
     return
   }
 
-  console.log(Object.fromEntries(new FormData(e.currentTarget)))
+  const values = Object.fromEntries(new FormData(e.currentTarget))
+
+  values.price = +values.price || null
+  values.liters = +values.liters
+
+  // if (values.id) {
+  //   // do stuff
+  // }
+
+  setNewItemInStorage(values)
+  setTimeout(() => alert('Abastecimento cadastrado com sucesso!'), 100)
 }
 
 export class ModalAbastecimento extends HTMLElement {
@@ -44,17 +43,17 @@ export class ModalAbastecimento extends HTMLElement {
   }
 
   connectedCallback() {
-    const fragment = getFragmentByTemplateId('#form_item_template')
+    const clone = getCloneByTemplateId('#form_item_template')
 
-    const dialog = fragment.querySelector('dialog')
-    const form = fragment.querySelector('form')
-    const legend = fragment.querySelector('legend')
-    const submitBtn = fragment.querySelector('button[type=submit]')
+    const dialog = clone.querySelector('dialog')
+    const form = clone.querySelector('form')
+    const legend = clone.querySelector('legend')
+    const submitBtn = clone.querySelector('button[type=submit]')
 
-    const inputId = fragment.querySelector('[name=id]')
-    const inputLiters = fragment.querySelector('[name=liters]')
-    const inputPrice = fragment.querySelector('[name=price]')
-    const inputDate = fragment.querySelector('[name=date]')
+    const inputId = clone.querySelector('[name=id]')
+    const inputLiters = clone.querySelector('[name=liters]')
+    const inputPrice = clone.querySelector('[name=price]')
+    const inputDate = clone.querySelector('[name=date]')
 
     inputDate.value = getTodayAsyyyyMMdd()
 
@@ -79,10 +78,10 @@ export class ModalAbastecimento extends HTMLElement {
     dialog.addEventListener('close', () => this.remove(), { ...this.#signal })
     
     const shadow = this.attachShadow({ mode: 'open' })
-    shadow.append(fragment)
+    shadow.append(clone)
 
     dialog.showModal()
   }
 }
 
-customElements.define('modal-abastecimento', ModalAbastecimento)
+customElements.define(MODAL_ABASTECIMENTO_NAME, ModalAbastecimento)
