@@ -13,7 +13,6 @@
 <body>
   <main id="root">
     <button type="button">Inserir Form</button>
-    <button type="button">Inserir Ta</button>
   </main>
 
   <template id="table_items_template">
@@ -42,6 +41,7 @@
               <th>Data</th>
               <th>Qtde.</th>
               <th>Preço</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -98,6 +98,11 @@
         border-radius: 50%;
         aspect-ratio: 1;
       }
+
+      input:read-only {
+        opacity: 0.75;
+        pointer-events: none;
+      }
     </style>
 
     <dialog>
@@ -108,8 +113,11 @@
         
         <form method="dialog">
           <input type="hidden" name="id">
+          <input type="hidden" name="delete">
 
           <button class="close-x">X</button>
+
+          <p class="excluir">Deseja excluir o item abaixo?</p>
     
           <div>
             <label>
