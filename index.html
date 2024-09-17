@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Abastecendo</title>
+  <link rel="shortcut icon" href="./static/images/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="./static/css/style.css">
+  <script type="module" src="./static/js/script.js" defer></script>
+</head>
+
+<body>
+  <main id="root">
+    <button type="button">Inserir Form</button>
+  </main>
+
+  <template id="form_item_template">
+    <style>
+      dialog {
+        border-radius: 10px;
+      }
+
+      dialog::backdrop {
+        background: rgba(0, 0, 0, 0.5);
+      }
+      
+      fieldset {
+        width: fit-content;
+        padding: 0 0.75em;
+      }
+
+      form {
+        padding: 0 2px;
+      }
+
+      label:has(>input[name="liters"][value]:not([value=""]))::after {
+        content: ' L.'
+      }
+
+      label:has(>input[name="price"][value]:not([value=""]))::before {
+        content: ' - R$ '
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      button.close-x {
+        position: absolute;
+        top: 0;
+        right: 0;
+        transform: translate(-50%, 50%);
+        border-radius: 50%;
+        aspect-ratio: 1;
+      }
+    </style>
+
+    <dialog>
+      <fieldset>
+        <legend>
+          <slot name="slot_legend">Inserir</slot>
+        </legend>
+        
+        <form method="dialog">
+          <input type="hidden" name="id">
+
+          <button class="close-x">X</button>
+    
+          <div>
+            <label>
+              Litros
+              <input type="text" inputmode="decimal" name="liters" placeholder="Somente números e vírgula">
+            </label>
+          </div>
+    
+          <div>
+            <label>
+              Valor total
+              <input type="text" inputmode="decimal" name="price" placeholder="Somente números e vírgula">
+            </label>
+          </div>
+    
+          <div>
+            <label>
+              Data
+              <input type="date" name="date" required>
+            </label>
+          </div>
+    
+          <div>
+            <button>Cancelar</button>
+            <button data-submitter="main"><slot name="slot_submit">Inserir</slot></button>
+          </div>
+        </form>
+      </fieldset>
+    </dialog>
+  </template>
+</body>
+
+</html>
