@@ -37,10 +37,8 @@ export class ModalAbastecimento extends HTMLElement {
   
   constructor(options = {}, excluir = false) {
     super()
-
     
     this.#options = { ...options }
-    console.log('options', this.#options)
     this.#excluir = excluir === true
     this.#controller = new AbortController()
     this.#signal = { signal: this.#controller.signal }

@@ -1,0 +1,19 @@
+@import url('./reset.css');
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  min-height: 100vh;
+  width: 100vw;
+}
+
+body>main {
+  border: solid 1px black;
+  width: min(1000px, calc(100vw - 10px));
+}
+
+button,
+::part(btn) {
+  cursor: pointer;
+}

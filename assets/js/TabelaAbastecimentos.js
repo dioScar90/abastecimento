@@ -1,4 +1,5 @@
 import { ModalAbastecimento } from "./ModalAbastecimento.js"
+import { RowAbastecimento } from "./RowAbastecimento.js"
 import { getCloneByTemplateId, getFormattedCurrency, getFormattedLiters, getFormattedLocaleDateString, getItemsByStorage } from "./utils.js"
 export const TABELA_ABASTECIMENTOS_NAME = 'tabela-abastecimentos'
 
@@ -23,14 +24,16 @@ function handleClickTbody(e) {
   document.body.append(new ModalAbastecimento({ ...tr.dataset }, true))
 }
 
-export class TabelaAbastecimentos extends HTMLElement {
+let countTabelaAbastecimentos = 0
+
+customElements.define(TABELA_ABASTECIMENTOS_NAME, class T extends HTMLElement {
+  #root
   #items = []
-  #trs = new Map()
   #controller
   #signal
 
   constructor() {
-    if (document.body.matches(`:has(${TABELA_ABASTECIMENTOS_NAME})`)) {
+    if (countTabelaAbastecimentos > 0) {
       throw new AlreadyExistsTabelaAbastecimentosError()
     }
 
@@ -38,8 +41,10 @@ export class TabelaAbastecimentos extends HTMLElement {
     this.#items = getItemsByStorage()
     this.#controller = new AbortController()
     this.#signal = { signal: this.#controller.signal }
-  }
 
+    countTabelaAbastecimentos++
+  }
+  
   static #getNewTr({ id, date, liters, price }) {
     const template = document.createElement('template')
 
@@ -60,9 +65,8 @@ export class TabelaAbastecimentos extends HTMLElement {
   }
 
   removerTr = id => {
-    const tr = this.#trs.get(id)
+    const tr = this.#root.querySelector(`tr[data-id="${id}"]`)
     tr?.remove()
-    this.#trs.delete(id)
   }
   
   // disconnectedCallback() {}
@@ -71,19 +75,12 @@ export class TabelaAbastecimentos extends HTMLElement {
     const clone = getCloneByTemplateId('#table_items_template')
     
     const tbody = clone.querySelector('tbody')
-    
-    const trs = this.#items.map(TabelaAbastecimentos.#getNewTr)
-    
-    trs.forEach(tr => {
-      tbody.append(tr)
-      this.#trs.set(tbody.lastElementChild.dataset.id, tbody.lastElementChild)
-    })
+    // this.#items.forEach(item => tbody.append(T.#getNewTr(item)))
+    this.#items.forEach(item => tbody.append(new RowAbastecimento(item)))
 
     tbody.addEventListener('click', handleClickTbody, { ...this.#signal })
     
-    const shadow = this.attachShadow({ mode: 'open' })
-    shadow.append(clone)
+    this.#root = this.attachShadow({ mode: 'open' })
+    this.#root.append(clone)
   }
-}
-
-customElements.define(TABELA_ABASTECIMENTOS_NAME, TabelaAbastecimentos)
+})

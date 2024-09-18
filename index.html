@@ -5,14 +5,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Abastecendo</title>
-  <link rel="shortcut icon" href="./static/images/favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" href="./static/css/style.css">
-  <script type="module" src="./static/js/script.js" defer></script>
+  <link rel="shortcut icon" href="./assets/images/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="./assets/css/style.css">
+  <script type="module" src="./assets/js/script.js" defer></script>
 </head>
 
 <body>
   <main id="root">
     <button type="button">Inserir Form</button>
+
+    <tabela-abastecimentos>
+      <h3 slot="header">Abastecimentos por data</h3>
+    </tabela-abastecimentos>
   </main>
 
   <template id="table_items_template">
@@ -32,8 +36,8 @@
     </style>
 
     <section>
-      <h3>Abastecimentos por data</h3>
-
+      <slot name="header">Escreva aqui o header da tabela</slot>
+      
       <div class="table-items">
         <table>
           <thead>
@@ -85,11 +89,7 @@
       label:has(>input[name="price"][value]:not([value=""]))::before {
         content: ' - R$ '
       }
-
-      button {
-        cursor: pointer;
-      }
-
+      
       button.close-x {
         position: absolute;
         top: 0;
@@ -115,7 +115,7 @@
           <input type="hidden" name="id">
           <input type="hidden" name="delete">
 
-          <button class="close-x">X</button>
+          <button part="btn" class="close-x">X</button>
 
           <p class="excluir">Deseja excluir o item abaixo?</p>
     
@@ -141,8 +141,8 @@
           </div>
     
           <div>
-            <button>Cancelar</button>
-            <button data-submitter="main"><slot name="slot_submit">Inserir</slot></button>
+            <button part="btn">Cancelar</button>
+            <button part="btn" data-submitter="main"><slot name="slot_submit">Inserir</slot></button>
           </div>
         </form>
       </fieldset>
