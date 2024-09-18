@@ -8,7 +8,7 @@ body {
   width: 100vw;
 }
 
-body>main {
+body > main {
   border: solid 1px black;
   width: min(1000px, calc(100vw - 10px));
 }

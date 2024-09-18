@@ -3,9 +3,15 @@ import { getCloneByTemplateId, getTodayAsyyyyMMdd, removeItemFromStorage, setNew
 
 export const MODAL_ABASTECIMENTO_NAME = 'modal-abastecimento'
 
-function setValueAttribute(e) {
-  // apply regex
-  e.currentTarget.setAttribute('value', e.currentTarget.value)
+function handleInput(e) {
+  const isLiters = e.currentTarget.name === 'liters'
+  const value = +e.currentTarget.value.replace(/\D/g, '')
+  const options = { style: 'currency', currency: 'BRL', minimumFractionDigits: isLiters ? 3 : 2 }
+  e.currentTarget.value = (value * (isLiters ? 0.001 : 0.01)).toLocaleString('pt-BR', { ...options }).replace('R$', '').trim()
+}
+
+function getTabelaAbastecimentos() {
+  return document.querySelector(TABELA_ABASTECIMENTOS_NAME)
 }
 
 function handleSubmit(e) {
@@ -15,18 +21,22 @@ function handleSubmit(e) {
 
   const values = Object.fromEntries(new FormData(e.currentTarget))
 
-  values.price = +values.price || null
-  values.liters = +values.liters
+  values.price = +values.price.replace(',', '.') || null
+  values.liters = +values.liters.replace(',', '.')
 
-  if (values.id && values.delete) {
+  const tabelaAbastecimentos = getTabelaAbastecimentos()
+
+  if (values.delete) {
     removeItemFromStorage(values.id)
-    document.querySelector(TABELA_ABASTECIMENTOS_NAME).removerTr(values.id)
-    setTimeout(() => alert('Abastecimento removido com sucesso!'), 100)
-    return
-  }
+    tabelaAbastecimentos.removeTr(values.id)
 
-  setNewItemInStorage(values)
-  setTimeout(() => alert('Abastecimento cadastrado com sucesso!'), 100)
+    setTimeout(() => alert('Abastecimento removido com sucesso!'), 100)
+  } else {
+    const [valuesWithId, idBefore] = setNewItemInStorage(values)
+    tabelaAbastecimentos.appendTr(valuesWithId, idBefore)
+
+    setTimeout(() => alert('Abastecimento cadastrado com sucesso!'), 100)
+  }
 }
 
 export class ModalAbastecimento extends HTMLElement {
@@ -54,7 +64,7 @@ export class ModalAbastecimento extends HTMLElement {
     const dialog = clone.querySelector('dialog')
     const form = clone.querySelector('form')
     const legend = clone.querySelector('legend')
-    const pExcluir = clone.querySelector('p.excluir')
+    const msgExcluir = clone.querySelector('.excluir')
     const submitBtn = clone.querySelector('button[data-submitter=main]')
 
     const inputId = clone.querySelector('[name=id]')
@@ -64,6 +74,7 @@ export class ModalAbastecimento extends HTMLElement {
     const inputDate = clone.querySelector('[name=date]')
 
     inputDate.value = getTodayAsyyyyMMdd()
+    inputDate.max = getTodayAsyyyyMMdd()
     
     if (this.#options.id) {
       legend.innerHTML = '<span slot="slot_legend">Modificar</span>'
@@ -85,11 +96,11 @@ export class ModalAbastecimento extends HTMLElement {
       legend.innerHTML = '<span slot="slot_legend">Excluir</span>'
       submitBtn.innerHTML = '<span slot="slot_submit">Excluir</span>'
     } else {
-      pExcluir.remove()
+      msgExcluir.remove()
     }
 
-    inputLiters.addEventListener('input', setValueAttribute, { ...this.#signal })
-    inputPrice.addEventListener('input', setValueAttribute, { ...this.#signal })
+    inputLiters.addEventListener('input', handleInput, { ...this.#signal })
+    inputPrice.addEventListener('input', handleInput, { ...this.#signal })
     
     form.addEventListener('submit', handleSubmit, { ...this.#signal })
     dialog.addEventListener('close', () => this.remove(), { ...this.#signal })

@@ -1,6 +1,6 @@
 import { ModalAbastecimento } from "./ModalAbastecimento.js"
 import { RowAbastecimento } from "./RowAbastecimento.js"
-import { getCloneByTemplateId, getFormattedCurrency, getFormattedLiters, getFormattedLocaleDateString, getItemsByStorage } from "./utils.js"
+import { getCloneByTemplateId, getItemsByStorage } from "./utils.js"
 export const TABELA_ABASTECIMENTOS_NAME = 'tabela-abastecimentos'
 
 class AlreadyExistsTabelaAbastecimentosError extends Error {
@@ -26,7 +26,7 @@ function handleClickTbody(e) {
 
 let countTabelaAbastecimentos = 0
 
-customElements.define(TABELA_ABASTECIMENTOS_NAME, class T extends HTMLElement {
+export class TabelaAbastecimentos extends HTMLElement {
   #root
   #items = []
   #controller
@@ -44,30 +44,16 @@ customElements.define(TABELA_ABASTECIMENTOS_NAME, class T extends HTMLElement {
 
     countTabelaAbastecimentos++
   }
+
+  #getSpecificTr = id => this.#root.querySelector(`tr[data-id="${id}"]`)
+  #getDefaultTr = () => this.#root.querySelector('tbody > tr.nada')
+
+  appendTr = (values, idBefore) => {
+    const trBefore = idBefore ? this.#getSpecificTr(idBefore) : this.#getDefaultTr()
+    trBefore.after(new RowAbastecimento(values))
+  }
   
-  static #getNewTr({ id, date, liters, price }) {
-    const template = document.createElement('template')
-
-    const data = getFormattedLocaleDateString(date)
-    const qtde = getFormattedLiters(liters)
-    const preco = !price ? '---' : getFormattedCurrency(price)
-
-    template.innerHTML = `
-      <tr data-id="${id}" data-date="${date}" data-liters="${liters}" data-price="${price || ''}">
-        <td>${data}</td>
-        <td>${qtde}</td>
-        <td>${preco}</td>
-        <td><button>Excluir</button></td>
-      </tr>
-    `
-
-    return template.content
-  }
-
-  removerTr = id => {
-    const tr = this.#root.querySelector(`tr[data-id="${id}"]`)
-    tr?.remove()
-  }
+  removeTr = id => this.#getSpecificTr(id)?.remove()
   
   // disconnectedCallback() {}
 
@@ -75,7 +61,6 @@ customElements.define(TABELA_ABASTECIMENTOS_NAME, class T extends HTMLElement {
     const clone = getCloneByTemplateId('#table_items_template')
     
     const tbody = clone.querySelector('tbody')
-    // this.#items.forEach(item => tbody.append(T.#getNewTr(item)))
     this.#items.forEach(item => tbody.append(new RowAbastecimento(item)))
 
     tbody.addEventListener('click', handleClickTbody, { ...this.#signal })
@@ -83,4 +68,6 @@ customElements.define(TABELA_ABASTECIMENTOS_NAME, class T extends HTMLElement {
     this.#root = this.attachShadow({ mode: 'open' })
     this.#root.append(clone)
   }
-})
+}
+
+customElements.define(TABELA_ABASTECIMENTOS_NAME, TabelaAbastecimentos)

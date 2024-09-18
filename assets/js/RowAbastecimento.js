@@ -1,33 +1,13 @@
-import { ModalAbastecimento } from "./ModalAbastecimento.js"
-import { getCloneByTemplateId, getFormattedCurrency, getFormattedLiters, getFormattedLocaleDateString, getItemsByStorage } from "./utils.js"
+import { getFormattedCurrency, getFormattedLiters, getFormattedLocaleDateString } from "./utils.js"
 export const ROW_ABASTECIMENTOS_NAME = 'row-abastecimento'
 
-function handleClickTbody(e) {
-  const button = e.target.closest('button')
-
-  if (!button) {
-    return
-  }
-
-  e.stopPropagation()
-
-  const tr = button.closest('tr')
-  document.body.append(new ModalAbastecimento({ ...tr.dataset }, true))
-}
-
 export class RowAbastecimento extends HTMLTableRowElement {
-  #root
   #values = {}
-  #trs = new Map()
-  #controller
-  #signal
 
   constructor(values) {
     super()
 
     this.#values = { ...values }
-    this.#controller = new AbortController()
-    this.#signal = { signal: this.#controller.signal }
   }
 
   static #getNewTr({ id, date, liters, price }) {
@@ -41,7 +21,7 @@ export class RowAbastecimento extends HTMLTableRowElement {
 			<td>${data}</td>
 			<td>${qtde}</td>
 			<td>${preco}</td>
-			<td><button>Excluir</button></td>
+			<td><button part="btn">Excluir</button></td>
     `
 
 		const datasets = [
@@ -54,17 +34,13 @@ export class RowAbastecimento extends HTMLTableRowElement {
     return [datasets, template.content]
   }
 
-  removerTr = () => this.remove()
+  removeTr = () => this.remove()
   
   // disconnectedCallback() {}
 
   connectedCallback() {
     const [datasets, tds] = RowAbastecimento.#getNewTr(this.#values)
-
-    // tbody.addEventListener('click', handleClickTbody, { ...this.#signal })
     
-    // this.#root = this.attachShadow({ mode: 'open' })
-    // this.#root.append(clone)
 		this.setAttribute('is', ROW_ABASTECIMENTOS_NAME)
 		datasets.forEach(([key, value]) => this.setAttribute(key, value))
 		

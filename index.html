@@ -78,15 +78,20 @@
         padding: 0 0.75em;
       }
 
+      .excluir {
+        margin: .5rem 0;
+        font-weight: bolder;
+      }
+
       form {
         padding: 0 2px;
       }
 
-      label:has(>input[name="liters"][value]:not([value=""]))::after {
+      label:has(+input[name="liters"][value]:not([value=""]))::after {
         content: ' L.'
       }
 
-      label:has(>input[name="price"][value]:not([value=""]))::before {
+      label:has(+.input[name="price"][value]:not([value=""]))::after {
         content: ' - R$ '
       }
       
@@ -94,7 +99,7 @@
         position: absolute;
         top: 0;
         right: 0;
-        transform: translate(-50%, 50%);
+        transform: translate(-50%, 50%) scale(1.5);
         border-radius: 50%;
         aspect-ratio: 1;
       }
@@ -120,24 +125,18 @@
           <p class="excluir">Deseja excluir o item abaixo?</p>
     
           <div>
-            <label>
-              Litros
-              <input type="text" inputmode="decimal" name="liters" placeholder="Somente números e vírgula">
-            </label>
+            <label for="liters">Litros</label>
+            <input type="text" inputmode="decimal" name="liters" id="liters" placeholder="Somente números e vírgula">
           </div>
     
           <div>
-            <label>
-              Valor total
-              <input type="text" inputmode="decimal" name="price" placeholder="Somente números e vírgula">
-            </label>
+            <label for="price">Valor total</label>
+            <input type="text" inputmode="decimal" name="price" id="price" placeholder="Somente números e vírgula">
           </div>
     
           <div>
-            <label>
-              Data
-              <input type="date" name="date" required>
-            </label>
+            <label for="date">Data</label>
+            <input type="date" id="date" name="date" required>
           </div>
     
           <div>
