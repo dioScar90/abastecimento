@@ -1,13 +1,7 @@
 import { TABELA_ABASTECIMENTOS_NAME } from "./TabelaAbastecimentos.js"
-import { getCloneByTemplateId, getTodayAsyyyyMMdd, removeItemFromStorage, setNewItemInStorage } from "./utils.js"
+import { getCloneByTemplateId, getNumberIntoFormattedDecimalStyle, getTodayAsyyyyMMdd, removeItemFromStorage, setNewItemInStorage } from "./utils.js"
 
 export const MODAL_ABASTECIMENTO_NAME = 'modal-abastecimento'
-
-function getNumberIntoFormattedDecimalStyle(value, threeDigits = false) {
-  value = +value.replace(/\D/g, '')
-  const options = { style: 'currency', currency: 'BRL', minimumFractionDigits: threeDigits ? 3 : 2 }
-  return (value * (threeDigits ? 0.001 : 0.01)).toLocaleString('pt-BR', { ...options }).replace('R$', '').trim()
-}
 
 function handleInput(e) {
   e.currentTarget.value = getNumberIntoFormattedDecimalStyle(e.currentTarget.value, e.currentTarget.name === 'liters')
@@ -20,7 +14,6 @@ function getTabelaAbastecimentos() {
 function handleEnterPress(e) {
   if (e.key === 'Enter') {
     e.preventDefault()
-    e.currentTarget.elements.main.click()
     e.currentTarget.querySelector('button:not([formnovalidate])').click()
   }
 }

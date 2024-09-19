@@ -71,5 +71,11 @@ export function getFormattedCurrency(value, locale = 'pt-BR', currency = 'BRL') 
 }
 
 export function getFormattedLiters(value) {
-  return value.toFixed(3) + ' L.'
+  return value.toFixed(3).replace('.', ',') + ' L.'
+}
+
+export function getNumberIntoFormattedDecimalStyle(value, threeDigits = false) {
+  value = +value.replace(/\D/g, '')
+  const options = { style: 'currency', currency: 'BRL', minimumFractionDigits: threeDigits ? 3 : 2 }
+  return (value * (threeDigits ? 0.001 : 0.01)).toLocaleString('pt-BR', { ...options }).replace('R$', '').trim()
 }
