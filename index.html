@@ -15,12 +15,25 @@
     <button type="button">Inserir Form</button>
 
     <tabela-abastecimentos>
-      <h3 slot="header">Abastecimentos por data</h3>
+      <span slot="header">Abastecimentos por data</span>
     </tabela-abastecimentos>
   </main>
 
   <template id="table_items_template">
     <style>
+      section {
+        min-width: min(400px, calc(100vw - 10px));
+      }
+
+      table {
+        width: 100%;
+      }
+
+      h3 {
+        text-align: center;
+        margin: 1rem 0;
+      }
+
       .nada div {
         width: 100%;
         text-align: center;
@@ -36,7 +49,7 @@
     </style>
 
     <section>
-      <slot name="header">Escreva aqui o header da tabela</slot>
+      <h3><slot name="header">Escreva aqui o header da tabela</slot></h3>
       
       <div class="table-items">
         <table>
@@ -45,7 +58,7 @@
               <th>Data</th>
               <th>Qtde.</th>
               <th>Preço</th>
-              <th></th>
+              <th>Ação</th>
             </tr>
           </thead>
           <tbody>
