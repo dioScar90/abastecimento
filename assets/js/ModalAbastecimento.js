@@ -17,8 +17,16 @@ function getTabelaAbastecimentos() {
   return document.querySelector(TABELA_ABASTECIMENTOS_NAME)
 }
 
+function handleEnterPress(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault()
+    e.currentTarget.elements.main.click()
+    e.currentTarget.querySelector('button:not([formnovalidate])').click()
+  }
+}
+
 function handleSubmit(e) {
-  if (e.submitter.dataset.submitter !== 'main') {
+  if (e.submitter.formNoValidate) {
     return
   }
 
@@ -106,6 +114,7 @@ export class ModalAbastecimento extends HTMLElement {
     inputLiters.addEventListener('input', handleInput, { ...this.#signal })
     inputPrice.addEventListener('input', handleInput, { ...this.#signal })
     
+    form.addEventListener('keydown', handleEnterPress, { ...this.#signal })
     form.addEventListener('submit', handleSubmit, { ...this.#signal })
     dialog.addEventListener('close', () => this.remove(), { ...this.#signal })
     
