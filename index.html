@@ -3,17 +3,19 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="author" content="Diogo L Scarmagnani">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Abastecendo</title>
+
   <link rel="shortcut icon" href="./assets/images/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="./assets/css/style.css">
+
   <script type="module" src="./assets/js/script.js" defer></script>
 </head>
 
 <body>
   <main id="root">
-    <button type="button">Inserir Form</button>
-
     <tabela-abastecimentos>
       <span slot="header">Abastecimentos por data</span>
     </tabela-abastecimentos>
@@ -23,10 +25,32 @@
     <style>
       section {
         min-width: min(400px, calc(100vw - 10px));
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        row-gap: 15px;
+      }
+
+      .btn-insert {
+        width: auto;
+      }
+
+      .table-items {
+        border: solid;
+        max-height: 400px;
+        width: 100%;
+        overflow: auto;
       }
 
       table {
         width: 100%;
+      }
+
+      table td,
+      table th {
+        vertical-align: middle !important;
+        text-align: center !important;
+        padding: 1px 0;
       }
 
       h3 {
@@ -34,13 +58,28 @@
         margin: 1rem 0;
       }
 
+      .nada td {
+        padding: 0.5rem;
+      }
+
+      .nada kbd {
+        background-color: goldenrod;
+        font-size: larger;
+        padding: 0 0.5rem;
+        border-radius: 5px;
+      }
+
       .nada div {
-        width: 100%;
+        width: auto;
+        padding: 0.5rem;
         text-align: center;
+        background-color: yellowgreen;
       }
 
       .nada p {
         margin: 0;
+        text-align: center;
+        color: var(--base-dark-color);
       }
 
       tbody > .nada:not(:only-of-type) {
@@ -50,6 +89,8 @@
 
     <section>
       <h3><slot name="header">Escreva aqui o header da tabela</slot></h3>
+
+      <button type="button" class="btn-insert" part="btn btn-primary btn-main">Novo Abastecimento</button>
       
       <div class="table-items">
         <table>
@@ -98,6 +139,10 @@
 
       form {
         padding: 0 2px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        min-height: 150px;
       }
 
       label:has(+input[name="liters"][value]:not([value=""]))::after {
@@ -117,34 +162,47 @@
         aspect-ratio: 1;
       }
 
+      input {
+        background-color: var(--base-dark-color);
+        color: var(--base-white-color);
+      }
+
       input:read-only {
         opacity: 0.75;
         pointer-events: none;
       }
+
+      input:read-only::placeholder {
+        color: transparent;
+      }
+
+      .buttons {
+        display: flex;
+        justify-content: space-evenly;
+        padding: 0.25rem;
+      }
     </style>
 
-    <dialog>
+    <dialog part="base">
       <fieldset>
-        <legend>
-          <slot name="slot_legend">Inserir</slot>
-        </legend>
+        <legend>Inserir</legend>
         
         <form method="dialog">
           <input type="hidden" name="id">
           <input type="hidden" name="delete">
 
-          <button part="btn" class="close-x">X</button>
+          <button part="btn btn-warning" class="close-x" formnovalidate>X</button>
 
           <p class="excluir">Deseja excluir o item abaixo?</p>
     
           <div>
             <label for="liters">Litros</label>
-            <input type="text" inputmode="decimal" name="liters" id="liters" placeholder="Somente números e vírgula">
+            <input type="text" inputmode="decimal" name="liters" id="liters" placeholder="Apenas números" required>
           </div>
     
           <div>
             <label for="price">Valor total</label>
-            <input type="text" inputmode="decimal" name="price" id="price" placeholder="Somente números e vírgula">
+            <input type="text" inputmode="decimal" name="price" id="price" placeholder="Apenas números">
           </div>
     
           <div>
@@ -152,9 +210,9 @@
             <input type="date" id="date" name="date" required>
           </div>
     
-          <div>
-            <button part="btn">Cancelar</button>
-            <button part="btn" data-submitter="main"><slot name="slot_submit">Inserir</slot></button>
+          <div class="buttons">
+            <button part="btn btn-secondary" formnovalidate>Cancelar</button>
+            <button part="btn btn-success btn-main" data-submitter="main">Inserir</button>
           </div>
         </form>
       </fieldset>

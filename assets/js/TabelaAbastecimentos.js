@@ -1,5 +1,6 @@
 import { ModalAbastecimento } from "./ModalAbastecimento.js"
 import { RowAbastecimento } from "./RowAbastecimento.js"
+import { MAIN_ROOT } from "./script.js"
 import { getCloneByTemplateId, getItemsByStorage } from "./utils.js"
 export const TABELA_ABASTECIMENTOS_NAME = 'tabela-abastecimentos'
 
@@ -60,10 +61,12 @@ export class TabelaAbastecimentos extends HTMLElement {
   connectedCallback() {
     const clone = getCloneByTemplateId('#table_items_template')
     
+    const buttonInsert = clone.querySelector('.btn-insert')
     const tbody = clone.querySelector('tbody')
     this.#items.forEach(item => tbody.append(new RowAbastecimento(item)))
 
     tbody.addEventListener('click', handleClickTbody, { ...this.#signal })
+    buttonInsert.addEventListener('click', () => MAIN_ROOT.append(new ModalAbastecimento()), { ...this.#signal })
     
     this.#root = this.attachShadow({ mode: 'open' })
     this.#root.append(clone)

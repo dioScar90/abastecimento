@@ -3,11 +3,14 @@ import { getCloneByTemplateId, getTodayAsyyyyMMdd, removeItemFromStorage, setNew
 
 export const MODAL_ABASTECIMENTO_NAME = 'modal-abastecimento'
 
+function getNumberIntoFormattedDecimalStyle(value, threeDigits = false) {
+  value = +value.replace(/\D/g, '')
+  const options = { style: 'currency', currency: 'BRL', minimumFractionDigits: threeDigits ? 3 : 2 }
+  return (value * (threeDigits ? 0.001 : 0.01)).toLocaleString('pt-BR', { ...options }).replace('R$', '').trim()
+}
+
 function handleInput(e) {
-  const isLiters = e.currentTarget.name === 'liters'
-  const value = +e.currentTarget.value.replace(/\D/g, '')
-  const options = { style: 'currency', currency: 'BRL', minimumFractionDigits: isLiters ? 3 : 2 }
-  e.currentTarget.value = (value * (isLiters ? 0.001 : 0.01)).toLocaleString('pt-BR', { ...options }).replace('R$', '').trim()
+  e.currentTarget.value = getNumberIntoFormattedDecimalStyle(e.currentTarget.value, e.currentTarget.name === 'liters')
 }
 
 function getTabelaAbastecimentos() {
@@ -77,24 +80,25 @@ export class ModalAbastecimento extends HTMLElement {
     inputDate.max = getTodayAsyyyyMMdd()
     
     if (this.#options.id) {
-      legend.innerHTML = '<span slot="slot_legend">Modificar</span>'
+      legend.innerHTML = 'Modificar'
       
       inputId.value = this.#options.id
       
-      inputLiters.value = this.#options.liters
-      inputPrice.value = this.#options.price ?? undefined
+      inputLiters.value = getNumberIntoFormattedDecimalStyle(this.#options.liters, true)
+      inputPrice.value = this.#options.price ? getNumberIntoFormattedDecimalStyle(this.#options.price) : null
 
       inputDate.value = this.#options.date
       inputDate.setAttribute('readonly', '')
 
-      submitBtn.innerHTML = '<span slot="slot_submit">Modificar</span>'
+      submitBtn.innerText = 'Modificar'
     }
 
     if (this.#excluir) {
       [inputLiters, inputPrice, inputDate].forEach(input => input.setAttribute('readonly', ''))
       inputDelete.value = this.#excluir
-      legend.innerHTML = '<span slot="slot_legend">Excluir</span>'
-      submitBtn.innerHTML = '<span slot="slot_submit">Excluir</span>'
+      legend.innerHTML = 'Excluir'
+      submitBtn.innerText = 'Excluir'
+      submitBtn.part.replace('btn-success', 'btn-danger')
     } else {
       msgExcluir.remove()
     }
@@ -109,6 +113,7 @@ export class ModalAbastecimento extends HTMLElement {
     shadow.append(clone)
 
     dialog.showModal()
+    setTimeout(() => inputLiters.focus(), 100)
   }
 }
 

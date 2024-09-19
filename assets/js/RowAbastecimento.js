@@ -21,7 +21,7 @@ export class RowAbastecimento extends HTMLTableRowElement {
 			<td>${data}</td>
 			<td>${qtde}</td>
 			<td>${preco}</td>
-			<td><button part="btn">Excluir</button></td>
+			<td><button part="btn btn-danger">Excluir</button></td>
     `
 
 		const datasets = [

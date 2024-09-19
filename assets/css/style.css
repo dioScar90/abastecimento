@@ -1,9 +1,15 @@
 @import url('./reset.css');
 
-* {
+:root {
+  --base-dark-color: #191919;
+  --base-white-color: #F2F2F2;
+}
+
+*,
+::part(base) {
   font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  background-color: #191919;
-  color: #F2F2F2;
+  background-color: var(--base-dark-color);
+  color: var(--base-white-color);
 }
 
 body {
@@ -24,4 +30,46 @@ body > main {
 button,
 ::part(btn) {
   cursor: pointer;
+  border-radius: 10px;
+}
+
+button:hover,
+::part(btn):hover {
+  opacity: 0.8;
+}
+
+.btn-primary,
+::part(btn-primary) {
+  background-color: midnightblue;
+  color: white;
+}
+
+.btn-secondary,
+::part(btn-secondary) {
+  background-color: darkslategrey;
+  color: white;
+}
+
+.btn-danger,
+::part(btn-danger) {
+  background-color: darkred;
+  color: white;
+}
+
+.btn-warning,
+::part(btn-warning) {
+  background-color: darkgoldenrod;
+  color: black;
+}
+
+.btn-success,
+::part(btn-success) {
+  background-color: limegreen;
+  color: black;
+}
+
+.btn-main,
+::part(btn-main) {
+  transform: scale(1.25);
+  padding: 0.25rem 0.5rem;
 }
