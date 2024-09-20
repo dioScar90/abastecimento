@@ -1,4 +1,4 @@
-import { getFormattedCurrency, getFormattedLiters, getFormattedLocaleDateString } from "./utils.js"
+import { getFormattedCurrency, getFormattedKm, getFormattedLiters, getFormattedLocaleDateString } from "./utils.js"
 export const ROW_ABASTECIMENTOS_NAME = 'row-abastecimento'
 
 export class RowAbastecimento extends HTMLTableRowElement {
@@ -10,16 +10,18 @@ export class RowAbastecimento extends HTMLTableRowElement {
     this.#values = { ...values }
   }
 
-  static #getNewTr({ id, date, liters, price }) {
+  static #getNewTr({ id, date, km, liters, price }) {
     const template = document.createElement('template')
 
     const data = getFormattedLocaleDateString(date)
-    const qtde = getFormattedLiters(liters)
+    const quilometragem = getFormattedKm(km)
+    const quantidade = getFormattedLiters(liters)
     const preco = !price ? '---' : getFormattedCurrency(price)
 
     template.innerHTML = `
 			<td>${data}</td>
-			<td>${qtde}</td>
+			<td>${quilometragem}</td>
+			<td>${quantidade}</td>
 			<td>${preco}</td>
 			<td><button part="btn btn-danger">Excluir</button></td>
     `
@@ -27,6 +29,7 @@ export class RowAbastecimento extends HTMLTableRowElement {
 		const datasets = [
 			['data-id', id],
 			['data-date', date],
+			['data-km', km],
 			['data-liters', liters],
 			['data-price', price || ''],
 		]

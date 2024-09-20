@@ -24,7 +24,7 @@
   <template id="table_items_template">
     <style>
       section {
-        min-width: min(400px, calc(100vw - 10px));
+        min-width: min(500px, calc(100vw - 10px));
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -97,6 +97,7 @@
           <thead>
             <tr>
               <th>Data</th>
+              <th>Km</th>
               <th>Qtde.</th>
               <th>Preço</th>
               <th>Ação</th>
@@ -121,6 +122,7 @@
     <style>
       dialog {
         border-radius: 10px;
+        padding-bottom: 0;
       }
 
       dialog::backdrop {
@@ -129,28 +131,16 @@
       
       fieldset {
         width: fit-content;
-        padding: 0 0.75em;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        row-gap: 0.75em;
+        padding: 0.25em 0.75em 0.75em;
       }
 
       .excluir {
         margin: .5rem 0;
         font-weight: bolder;
-      }
-
-      form {
-        padding: 0 2px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
-        min-height: 150px;
-      }
-
-      label:has(+input[name="liters"][value]:not([value=""]))::after {
-        content: ' L.'
-      }
-
-      label:has(+.input[name="price"][value]:not([value=""]))::after {
-        content: ' - R$ '
       }
       
       button.close-x {
@@ -167,33 +157,40 @@
         color: var(--base-white-color);
       }
 
-      input:read-only {
+      fieldset:disabled input {
         opacity: 0.75;
         pointer-events: none;
       }
-
-      input:read-only::placeholder {
-        color: transparent;
-      }
-
+        
       .buttons {
         display: flex;
         justify-content: space-evenly;
+        align-items: center;
         padding: 0.25rem;
+        min-height: 50px;
+      }
+
+      .buttons button {
+        height: fit-content;
       }
     </style>
 
     <dialog part="base">
-      <fieldset>
-        <legend>Inserir</legend>
-        
-        <form method="dialog">
-          <input type="hidden" name="id">
-          <input type="hidden" name="delete">
+      <form method="dialog">
+        <input type="hidden" name="id">
+        <input type="hidden" name="delete">
 
-          <button part="btn btn-warning" class="close-x" formnovalidate>X</button>
+        <button part="btn btn-warning" class="close-x" formnovalidate>X</button>
+
+        <fieldset>
+          <legend>Inserir</legend>
 
           <p class="excluir">Deseja excluir o item abaixo?</p>
+    
+          <div>
+            <label for="km">Km</label>
+            <input type="text" inputmode="numeric" name="km" id="km" placeholder="Apenas números" required>
+          </div>
     
           <div>
             <label for="liters">Litros</label>
@@ -209,13 +206,13 @@
             <label for="date">Data</label>
             <input type="date" id="date" name="date" required>
           </div>
+        </fieldset>
     
-          <div class="buttons">
-            <button part="btn btn-secondary" formnovalidate>Cancelar</button>
-            <button part="btn btn-success btn-main" data-submitter="main">Inserir</button>
-          </div>
-        </form>
-      </fieldset>
+        <div class="buttons">
+          <button part="btn btn-secondary" formnovalidate>Cancelar</button>
+          <button part="btn btn-success btn-main" data-submitter="main">Inserir</button>
+        </div>
+      </form>
     </dialog>
   </template>
 </body>

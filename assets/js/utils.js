@@ -71,12 +71,21 @@ export function getFormattedCurrency(value, locale = 'pt-BR', currency = 'BRL') 
   return value.toLocaleString(locale, { style: 'currency', currency })
 }
 
+export function getFormattedKm(value) {
+  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0 }).replace('R$', '').trim() + ' Km'
+}
+
 export function getFormattedLiters(value) {
+  value = typeof value === 'number' ? value : +value
   return value.toFixed(3).replace('.', ',') + ' L'
 }
 
+export function getOnlyNumbers(value) {
+  return value.replace(/\D/g, '')
+}
+
 export function getNumberIntoFormattedDecimalStyle(value, threeDigits = false) {
-  value = +value.replace(/\D/g, '')
+  value = +getOnlyNumbers(value)
   const options = { style: 'currency', currency: 'BRL', minimumFractionDigits: threeDigits ? 3 : 2 }
   return (value * (threeDigits ? 0.001 : 0.01)).toLocaleString('pt-BR', { ...options }).replace('R$', '').trim()
 }

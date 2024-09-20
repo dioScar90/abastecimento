@@ -1,7 +1,11 @@
 import { TABELA_ABASTECIMENTOS_NAME } from "./TabelaAbastecimentos.js"
-import { getCloneByTemplateId, getNumberIntoFormattedDecimalStyle, getTodayAsyyyyMMdd, removeItemFromStorage, setNewItemInStorage } from "./utils.js"
+import { getCloneByTemplateId, getFormattedCurrency, getFormattedKm, getFormattedLiters, getNumberIntoFormattedDecimalStyle, getOnlyNumbers, getTodayAsyyyyMMdd, removeItemFromStorage, setNewItemInStorage } from "./utils.js"
 
 export const MODAL_ABASTECIMENTO_NAME = 'modal-abastecimento'
+
+function handleInputKm(e) {
+  e.currentTarget.value = getOnlyNumbers(e.currentTarget.value) || ''
+}
 
 function handleInput(e) {
   e.currentTarget.value = getNumberIntoFormattedDecimalStyle(e.currentTarget.value, e.currentTarget.name === 'liters')
@@ -23,24 +27,25 @@ function handleSubmit(e) {
     return
   }
 
-  const values = Object.fromEntries(new FormData(e.currentTarget))
-
-  values.price = +values.price.replace(',', '.') || null
-  values.liters = +values.liters.replace(',', '.')
-
   const tabelaAbastecimentos = getTabelaAbastecimentos()
-
-  if (values.delete) {
+  const values = Object.fromEntries(new FormData(e.currentTarget))
+  
+  if (values.id && values.delete) {
     removeItemFromStorage(values.id)
     tabelaAbastecimentos.removeTr(values.id)
 
     setTimeout(() => alert('Abastecimento removido com sucesso!'), 100)
-  } else {
-    const [valuesWithId, idBefore] = setNewItemInStorage(values)
-    tabelaAbastecimentos.appendTr(valuesWithId, idBefore)
-
-    setTimeout(() => alert('Abastecimento cadastrado com sucesso!'), 100)
+    return
   }
+
+  values.km = +values.km.replace(',', '.')
+  values.liters = +values.liters.replace(',', '.')
+  values.price = +values.price.replace(',', '.') || null
+  
+  const [valuesWithId, idBefore] = setNewItemInStorage(values)
+  tabelaAbastecimentos.appendTr(valuesWithId, idBefore)
+
+  setTimeout(() => alert('Abastecimento cadastrado com sucesso!'), 100)
 }
 
 export class ModalAbastecimento extends HTMLElement {
@@ -68,11 +73,13 @@ export class ModalAbastecimento extends HTMLElement {
     const dialog = clone.querySelector('dialog')
     const form = clone.querySelector('form')
     const legend = clone.querySelector('legend')
+    const fieldset = clone.querySelector('fieldset')
     const msgExcluir = clone.querySelector('.excluir')
     const submitBtn = clone.querySelector('button[data-submitter=main]')
 
     const inputId = clone.querySelector('[name=id]')
     const inputDelete = clone.querySelector('[name=delete]')
+    const inputKm = clone.querySelector('[name=km]')
     const inputLiters = clone.querySelector('[name=liters]')
     const inputPrice = clone.querySelector('[name=price]')
     const inputDate = clone.querySelector('[name=date]')
@@ -80,23 +87,17 @@ export class ModalAbastecimento extends HTMLElement {
     inputDate.value = getTodayAsyyyyMMdd()
     inputDate.max = getTodayAsyyyyMMdd()
     
-    if (this.#options.id) {
-      legend.innerHTML = 'Modificar'
-      
+    if (this.#options.id && this.#excluir) {
       inputId.value = this.#options.id
-      
-      inputLiters.value = getNumberIntoFormattedDecimalStyle(this.#options.liters, true)
-      inputPrice.value = this.#options.price ? getNumberIntoFormattedDecimalStyle(this.#options.price) : null
 
+      inputKm.value = getFormattedKm(this.#options.km)
+      inputLiters.value = getFormattedLiters(this.#options.liters, true)
+      inputPrice.value = this.#options.price ? getFormattedCurrency(this.#options.price) : '---'
       inputDate.value = this.#options.date
-      inputDate.setAttribute('readonly', '')
 
-      submitBtn.innerText = 'Modificar'
-    }
-
-    if (this.#excluir) {
-      [inputLiters, inputPrice, inputDate].forEach(input => input.setAttribute('readonly', ''))
+      fieldset.disabled = true
       inputDelete.value = this.#excluir
+      
       legend.innerHTML = 'Excluir'
       submitBtn.innerText = 'Excluir'
       submitBtn.part.replace('btn-success', 'btn-danger')
@@ -104,6 +105,7 @@ export class ModalAbastecimento extends HTMLElement {
       msgExcluir.remove()
     }
 
+    inputKm.addEventListener('input', handleInputKm, { ...this.#signal })
     inputLiters.addEventListener('input', handleInput, { ...this.#signal })
     inputPrice.addEventListener('input', handleInput, { ...this.#signal })
     
@@ -115,7 +117,7 @@ export class ModalAbastecimento extends HTMLElement {
     shadow.append(clone)
 
     dialog.showModal()
-    setTimeout(() => inputLiters.focus(), 100)
+    setTimeout(() => inputKm.focus(), 100)
   }
 }
 
