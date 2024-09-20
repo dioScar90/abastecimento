@@ -20,18 +20,16 @@ export function getItemsByStorage() {
   }
 }
 
-function getMaxCountOfDate(items, dateToAppend) {
-  return Math.max(items.reduce((acc, { date, countOfDate }) => [...acc, (date === dateToAppend ? countOfDate : 0)], []))
-}
-
 export function setNewItemInStorage(values) {
   const items = getItemsByStorage()
 
   const newItem = { ...values }
   newItem.id = crypto.randomUUID()
-  newItem.countOfDate = getMaxCountOfDate(items, newItem.date) + 1
   
-  const newItems = [...items, { ...newItem }].toSorted((a, b) => b.date.localeCompare(a.date) || b.countOfDate - a.countOfDate)
+  const newItems = [...items, { ...newItem }]
+    .toSorted((a, b) => b.date.localeCompare(a.date) || b.km - a.km)
+    .map(({ countOfDate, ...rest }) => ({ ...rest }))
+  
   localStorage.setItem(ABASTECIMENTOS_KEY, JSON.stringify(newItems))
 
   const currentIdx = newItems.findIndex(({ id }) => id === newItem.id)

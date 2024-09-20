@@ -1,3 +1,4 @@
+import { GraficoAbastecimentos } from "./GraficoAbastecimentos.js"
 import { ModalAbastecimento } from "./ModalAbastecimento.js"
 import { RowAbastecimento } from "./RowAbastecimento.js"
 import { MAIN_ROOT } from "./script.js"
@@ -32,6 +33,7 @@ export class TabelaAbastecimentos extends HTMLElement {
   #items = []
   #controller
   #signal
+  #chart
 
   constructor() {
     if (countTabelaAbastecimentos > 0) {
@@ -52,9 +54,13 @@ export class TabelaAbastecimentos extends HTMLElement {
   appendTr = (values, idBefore) => {
     const trBefore = idBefore ? this.#getSpecificTr(idBefore) : this.#getDefaultTr()
     trBefore.after(new RowAbastecimento(values))
+    this.#chart.updateChart()
   }
   
-  removeTr = id => this.#getSpecificTr(id)?.remove()
+  removeTr = (id) => {
+    this.#getSpecificTr(id)?.remove()
+    this.#chart.updateChart()
+  }
   
   // disconnectedCallback() {}
 
@@ -70,6 +76,9 @@ export class TabelaAbastecimentos extends HTMLElement {
     
     this.#root = this.attachShadow({ mode: 'open' })
     this.#root.append(clone)
+
+    this.#chart = new GraficoAbastecimentos()
+    this.#root.after(this.#chart)
   }
 }
 
