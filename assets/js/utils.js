@@ -20,8 +20,9 @@ export function getItemsByStorage() {
   }
 }
 
-const getMaxCountOfDate = (items, dateToAppend) =>
-  Math.max(items.reduce((acc, { date, countOfDate }) => [...acc, (date === dateToAppend ? countOfDate : 0)], []))
+function getMaxCountOfDate(items, dateToAppend) {
+  return Math.max(items.reduce((acc, { date, countOfDate }) => [...acc, (date === dateToAppend ? countOfDate : 0)], []))
+}
 
 export function setNewItemInStorage(values) {
   const items = getItemsByStorage()
@@ -30,7 +31,7 @@ export function setNewItemInStorage(values) {
   newItem.id = crypto.randomUUID()
   newItem.countOfDate = getMaxCountOfDate(items, newItem.date) + 1
   
-  const newItems = [...items, { ...newItem }].toSorted((a, b) => a.date.localeCompare(b.date) || b.countOfDate - a.countOfDate)
+  const newItems = [...items, { ...newItem }].toSorted((a, b) => b.date.localeCompare(a.date) || b.countOfDate - a.countOfDate)
   localStorage.setItem(ABASTECIMENTOS_KEY, JSON.stringify(newItems))
 
   const currentIdx = newItems.findIndex(({ id }) => id === newItem.id)
@@ -71,7 +72,7 @@ export function getFormattedCurrency(value, locale = 'pt-BR', currency = 'BRL') 
 }
 
 export function getFormattedLiters(value) {
-  return value.toFixed(3).replace('.', ',') + ' L.'
+  return value.toFixed(3).replace('.', ',') + ' L'
 }
 
 export function getNumberIntoFormattedDecimalStyle(value, threeDigits = false) {
