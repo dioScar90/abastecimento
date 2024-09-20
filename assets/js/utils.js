@@ -71,8 +71,9 @@ export function getFormattedCurrency(value, locale = 'pt-BR', currency = 'BRL') 
   return value.toLocaleString(locale, { style: 'currency', currency })
 }
 
-export function getFormattedKm(value) {
-  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0 }).replace('R$', '').trim() + ' Km'
+export function getFormattedKm(value, km = false) {
+  const newValue = value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0 }).replace('R$', '').trim()
+  return km ? newValue + ' Km' : newValue
 }
 
 export function getFormattedLiters(value) {

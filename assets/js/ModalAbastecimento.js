@@ -90,7 +90,7 @@ export class ModalAbastecimento extends HTMLElement {
     if (this.#options.id && this.#excluir) {
       inputId.value = this.#options.id
 
-      inputKm.value = getFormattedKm(this.#options.km)
+      inputKm.value = getFormattedKm(this.#options.km, true)
       inputLiters.value = getFormattedLiters(this.#options.liters, true)
       inputPrice.value = this.#options.price ? getFormattedCurrency(this.#options.price) : '---'
       inputDate.value = this.#options.date
