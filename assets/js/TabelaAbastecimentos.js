@@ -54,12 +54,36 @@ export class TabelaAbastecimentos extends HTMLElement {
   appendTr = (values, idBefore) => {
     const trBefore = idBefore ? this.#getSpecificTr(idBefore) : this.#getDefaultTr()
     trBefore.after(new RowAbastecimento(values))
-    this.#chart.updateChart()
+    this.#updateChart()
+  }
+
+  #createChart() {
+    this.#chart = new GraficoAbastecimentos()
+    this.#root.after(this.#chart)
+  }
+
+  #updateItems() {
+    this.#items = getItemsByStorage()
+  }
+  
+  #updateChart() {
+    this.#updateItems()
+
+    if (this.#items?.length) {
+      if (this.#chart) {
+        this.#chart.updateChart()
+      } else {
+        this.#createChart()
+      }
+    } else {
+      this.#chart?.remove()
+      this.#chart = null
+    }
   }
   
   removeTr = (id) => {
     this.#getSpecificTr(id)?.remove()
-    this.#chart.updateChart()
+    this.#updateChart()
   }
   
   // disconnectedCallback() {}
@@ -70,15 +94,16 @@ export class TabelaAbastecimentos extends HTMLElement {
     const buttonInsert = clone.querySelector('.btn-insert')
     const tbody = clone.querySelector('tbody')
     this.#items.forEach(item => tbody.append(new RowAbastecimento(item)))
-
+    
     tbody.addEventListener('click', handleClickTbody, { ...this.#signal })
     buttonInsert.addEventListener('click', () => MAIN_ROOT.append(new ModalAbastecimento()), { ...this.#signal })
     
     this.#root = this.attachShadow({ mode: 'open' })
     this.#root.append(clone)
 
-    this.#chart = new GraficoAbastecimentos()
-    this.#root.after(this.#chart)
+    if (this.#items?.length) {
+      this.#createChart()
+    }
   }
 }
 

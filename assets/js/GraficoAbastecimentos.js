@@ -1,7 +1,9 @@
-import { Chart } from "./script.js"
+// import { Chart } from "./script.js"
 import { getCloneByTemplateId, getItemsByStorage } from "./utils.js"
 
-export const GRAFICO_ABASTECIMENTOS_NAME = 'tabela-abastecimentos'
+console.log({ Chart })
+
+export const GRAFICO_ABASTECIMENTOS_NAME = 'grafico-abastecimentos'
 
 function getBaseConfigForChart() {
   return {
@@ -40,8 +42,27 @@ function getBaseCssForChart() {
   }
 }
 
+function getObjectForCreatingChart(data = [], labels = []) {
+  return {
+    ...getBaseConfigForChart(),
+    data: {
+      labels,
+      datasets: [{
+        label: 'Autonomia',
+        data,
+        ...getBaseCssForChart()
+      }]
+    }
+  }
+}
+
 function getItemsForChart() {
   const values = getItemsByStorage()
+
+  if (!values.length) {
+    return getObjectForCreatingChart()
+  }
+
   const itens = []
 
   let lastKm = values.at(-1).km
@@ -63,17 +84,7 @@ function getItemsForChart() {
   const labels = itens.map(({ date }) => date)
   const data = itens.map(({ autonomia }) => autonomia.toFixed(2))
 
-  return {
-    ...getBaseConfigForChart(),
-    data: {
-      labels,
-      datasets: [{
-        label: 'Autonomia',
-        data,
-        ...getBaseCssForChart()
-      }]
-    }
-  }
+  return getObjectForCreatingChart(data, labels)
 }
 
 export class GraficoAbastecimentos extends HTMLElement {
@@ -93,7 +104,7 @@ export class GraficoAbastecimentos extends HTMLElement {
 
   #getNewChart(canvas = null) {
     canvas ??= this.#root.querySelector('canvas')
-    return new Chart(canvas, ...this.#chartValues)
+    return new Chart(canvas.getContext('2d'), { ...this.#chartValues })
   }
 
   updateChart() {
@@ -107,11 +118,11 @@ export class GraficoAbastecimentos extends HTMLElement {
     const clone = getCloneByTemplateId('#chart_template')
     
     const canvas = clone.querySelector('canvas')
-
-    this.#chart = this.#getNewChart(canvas)
     
     this.#root = this.attachShadow({ mode: 'open' })
     this.#root.append(clone)
+
+    this.#chart = this.#getNewChart(canvas)
   }
 }
 

@@ -56,13 +56,17 @@ export function removeItemFromStorage(id) {
   return true
 }
 
+export function getToday() {
+  return new Date(new Date().setHours(12))
+}
+
 export function getTodayAsyyyyMMdd() {
-  const date = new Date()
+  const date = getToday()
   return date.toISOString().split('T')[0]
 }
 
 export function getFormattedLocaleDateString(date) {
-  return new Date(date + 'T00:00').toLocaleDateString('pt-BR')
+  return new Date(date + 'T12:00').toLocaleDateString('pt-BR')
 }
 
 export function getFormattedCurrency(value, locale = 'pt-BR', currency = 'BRL') {
