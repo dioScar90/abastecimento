@@ -27,7 +27,7 @@ export function setNewItemInStorage(values) {
   newItem.id = crypto.randomUUID()
   
   const newItems = [...items, { ...newItem }]
-    .toSorted((a, b) => b.date.localeCompare(a.date) || b.km - a.km)
+    .toSorted((a, b) => b.date.localeCompare(a.date) || b.isFull || b.km - a.km)
     .map(({ countOfDate, ...rest }) => ({ ...rest }))
   
   localStorage.setItem(ABASTECIMENTOS_KEY, JSON.stringify(newItems))
@@ -37,10 +37,20 @@ export function setNewItemInStorage(values) {
   return [newItem, idBefore]
 }
 
+export function getItemFromStorage(id) {
+  const items = getItemsByStorage()
+
+  if (!items.length) {
+    return null
+  }
+
+  return items.find(item => item.id === id) ?? null
+}
+
 export function removeItemFromStorage(id) {
   const items = getItemsByStorage()
 
-  if (!items.length || !Array.isArray(items)) {
+  if (!items.length) {
     return false
   }
 

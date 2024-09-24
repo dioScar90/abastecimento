@@ -1,7 +1,4 @@
-// import { Chart } from "./script.js"
-import { getCloneByTemplateId, getItemsByStorage } from "./utils.js"
-
-console.log({ Chart })
+import { getCloneByTemplateId, getFormattedLocaleDateString, getItemsByStorage } from "./utils.js"
 
 export const GRAFICO_ABASTECIMENTOS_NAME = 'grafico-abastecimentos'
 
@@ -72,7 +69,7 @@ function getItemsForChart() {
     lastKm = values[i].km > lastKm ? values[i].km : lastKm
     litros += values[i].liters
 
-    if (values[i].full === true) {
+    if (values[i].isFull) {
       const percorrido = !itens.length ? lastKm : lastKm - itens.at(-1).lastKm
       const autonomia = percorrido / litros
 
@@ -81,7 +78,7 @@ function getItemsForChart() {
     }
   }
 
-  const labels = itens.map(({ date }) => date)
+  const labels = itens.map(({ date }) => getFormattedLocaleDateString(date))
   const data = itens.map(({ autonomia }) => autonomia.toFixed(2))
 
   return getObjectForCreatingChart(data, labels)
@@ -103,13 +100,11 @@ export class GraficoAbastecimentos extends HTMLElement {
   }
 
   #getNewChart(canvas = null) {
-    canvas ??= this.#root.querySelector('canvas')
     return new Chart(canvas.getContext('2d'), { ...this.#chartValues })
   }
 
   updateChart() {
     this.#chartValues = getItemsForChart()
-    this.#getNewChart()
   }
   
   // disconnectedCallback() {}

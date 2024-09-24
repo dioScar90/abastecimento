@@ -1,5 +1,5 @@
 import { TABELA_ABASTECIMENTOS_NAME } from "./TabelaAbastecimentos.js"
-import { getCloneByTemplateId, getFormattedCurrency, getFormattedKm, getFormattedLiters, getNumberIntoFormattedDecimalStyle, getOnlyNumbers, getTodayAsyyyyMMdd, removeItemFromStorage, setNewItemInStorage } from "./utils.js"
+import { getCloneByTemplateId, getFormattedKm, getFormattedLiters, getItemFromStorage, getNumberIntoFormattedDecimalStyle, getOnlyNumbers, getTodayAsyyyyMMdd, removeItemFromStorage, setNewItemInStorage } from "./utils.js"
 
 export const MODAL_ABASTECIMENTO_NAME = 'modal-abastecimento'
 
@@ -40,7 +40,7 @@ function handleSubmit(e) {
 
   values.km = +values.km.replace(',', '.')
   values.liters = +values.liters.replace(',', '.')
-  values.price = +values.price.replace(',', '.') || null
+  values.isFull = !!values.isFull
   
   const [valuesWithId, idBefore] = setNewItemInStorage(values)
   tabelaAbastecimentos.appendTr(valuesWithId, idBefore)
@@ -54,11 +54,11 @@ export class ModalAbastecimento extends HTMLElement {
   #controller
   #signal
   
-  constructor(options = {}, excluir = false) {
+  constructor(id = null) {
     super()
     
-    this.#options = { ...options }
-    this.#excluir = excluir === true
+    this.#options = getItemFromStorage(id) ?? {}
+    this.#excluir = !!id
     this.#controller = new AbortController()
     this.#signal = { signal: this.#controller.signal }
   }
@@ -81,7 +81,7 @@ export class ModalAbastecimento extends HTMLElement {
     const inputDelete = clone.querySelector('[name=delete]')
     const inputKm = clone.querySelector('[name=km]')
     const inputLiters = clone.querySelector('[name=liters]')
-    const inputPrice = clone.querySelector('[name=price]')
+    const inputIsFull = clone.querySelector('[name=isFull]')
     const inputDate = clone.querySelector('[name=date]')
 
     inputDate.value = getTodayAsyyyyMMdd()
@@ -92,7 +92,7 @@ export class ModalAbastecimento extends HTMLElement {
 
       inputKm.value = getFormattedKm(this.#options.km, true)
       inputLiters.value = getFormattedLiters(this.#options.liters, true)
-      inputPrice.value = this.#options.price ? getFormattedCurrency(this.#options.price) : '---'
+      inputIsFull.checked = !!this.#options?.isFull
       inputDate.value = this.#options.date
 
       fieldset.disabled = true
@@ -107,7 +107,7 @@ export class ModalAbastecimento extends HTMLElement {
 
     inputKm.addEventListener('input', handleInputKm, { ...this.#signal })
     inputLiters.addEventListener('input', handleInput, { ...this.#signal })
-    inputPrice.addEventListener('input', handleInput, { ...this.#signal })
+    inputIsFull.addEventListener('change', e => inputLiters.toggleAttribute('required', e.currentTarget.checked), { ...this.#signal })
     
     form.addEventListener('keydown', handleEnterPress, { ...this.#signal })
     form.addEventListener('submit', handleSubmit, { ...this.#signal })

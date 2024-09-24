@@ -23,7 +23,7 @@ function handleClickTbody(e) {
   e.stopPropagation()
 
   const tr = button.closest('tr')
-  document.body.append(new ModalAbastecimento({ ...tr.dataset }, true))
+  document.body.append(new ModalAbastecimento(tr.dataset.id))
 }
 
 let countTabelaAbastecimentos = 0
@@ -59,7 +59,7 @@ export class TabelaAbastecimentos extends HTMLElement {
 
   #createChart() {
     this.#chart = new GraficoAbastecimentos()
-    this.#root.after(this.#chart)
+    this.after(this.#chart)
   }
 
   #updateItems() {

@@ -1,4 +1,4 @@
-import { getFormattedCurrency, getFormattedKm, getFormattedLiters, getFormattedLocaleDateString } from "./utils.js"
+import { getFormattedKm, getFormattedLiters, getFormattedLocaleDateString } from "./utils.js"
 export const ROW_ABASTECIMENTOS_NAME = 'row-abastecimento'
 
 export class RowAbastecimento extends HTMLTableRowElement {
@@ -10,31 +10,23 @@ export class RowAbastecimento extends HTMLTableRowElement {
     this.#values = { ...values }
   }
 
-  static #getNewTr({ id, date, km, liters, price }) {
+  static #getNewTr({ date, km, liters, isFull }) {
     const template = document.createElement('template')
 
     const data = getFormattedLocaleDateString(date)
     const quilometragem = getFormattedKm(km)
     const quantidade = getFormattedLiters(liters)
-    const preco = !price ? '---' : getFormattedCurrency(price)
+    const completou = !isFull ? '---' : 'Completou'
 
     template.innerHTML = `
 			<td>${data}</td>
 			<td>${quilometragem}</td>
 			<td>${quantidade}</td>
-			<td>${preco}</td>
+			<td>${completou}</td>
 			<td><button part="btn btn-danger">Excluir</button></td>
     `
-
-		const datasets = [
-			['data-id', id],
-			['data-date', date],
-			['data-km', km],
-			['data-liters', liters],
-			['data-price', price || ''],
-		]
-		
-    return [datasets, template.content]
+    
+    return template.content
   }
 
   removeTr = () => this.remove()
@@ -42,10 +34,10 @@ export class RowAbastecimento extends HTMLTableRowElement {
   // disconnectedCallback() {}
 
   connectedCallback() {
-    const [datasets, tds] = RowAbastecimento.#getNewTr(this.#values)
+    const tds = RowAbastecimento.#getNewTr(this.#values)
     
 		this.setAttribute('is', ROW_ABASTECIMENTOS_NAME)
-		datasets.forEach(([key, value]) => this.setAttribute(key, value))
+		this.setAttribute('data-id', this.#values.id)
 		
     this.append(tds)
   }
