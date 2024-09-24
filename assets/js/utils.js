@@ -27,8 +27,7 @@ export function setNewItemInStorage(values) {
   newItem.id = crypto.randomUUID()
   
   const newItems = [...items, { ...newItem }]
-    .toSorted((a, b) => b.date.localeCompare(a.date) || b.isFull || b.km - a.km)
-    .map(({ countOfDate, ...rest }) => ({ ...rest }))
+    .toSorted((a, b) => a.date.localeCompare(b.date) || !b.isFull || a.liters - b.liters)
   
   localStorage.setItem(ABASTECIMENTOS_KEY, JSON.stringify(newItems))
 

@@ -24,22 +24,22 @@ function getBaseCssForChart() {
       'rgba(75, 192, 192, 0.2)',
       'rgba(54, 162, 235, 0.2)',
       'rgba(153, 102, 255, 0.2)',
-      'rgba(201, 203, 207, 0.2)'
+      'rgba(201, 203, 207, 0.2)',
     ],
     borderColor: [
+      'rgb(201, 203, 207)',
       'rgb(255, 99, 132)',
       'rgb(255, 159, 64)',
       'rgb(255, 205, 86)',
       'rgb(75, 192, 192)',
       'rgb(54, 162, 235)',
       'rgb(153, 102, 255)',
-      'rgb(201, 203, 207)'
     ],
     borderWidth: 1
   }
 }
 
-function getObjectForCreatingChart(data = [], labels = []) {
+function getObjectForCreatingChart({ labels, data }) {
   return {
     ...getBaseConfigForChart(),
     data: {
@@ -53,58 +53,73 @@ function getObjectForCreatingChart(data = [], labels = []) {
   }
 }
 
-function getItemsForChart() {
+function getLabelsAndDataProps() {
   const values = getItemsByStorage()
 
   if (!values.length) {
-    return getObjectForCreatingChart()
+    return { labels: [], data: [] }
   }
 
   const itens = []
 
-  let lastKm = values.at(-1).km
+  let lastKm = 0
   let litros = 0
+  
+  for (let i = 0; i < values.length; i++) {
+    if (i === 0 && values[i].isFull) {
+      lastKm = values[i].km
+      continue
+    }
 
-  for (let i = values.length - 1; i >= 0; i--) {
-    lastKm = values[i].km > lastKm ? values[i].km : lastKm
     litros += values[i].liters
 
     if (values[i].isFull) {
-      const percorrido = !itens.length ? lastKm : lastKm - itens.at(-1).lastKm
+      const percorrido = values[i].km - lastKm
       const autonomia = percorrido / litros
 
       itens.push({ percorrido, lastKm, litros, autonomia, date: values[i].date })
-      lastKm = litros = 0
+
+      lastKm = values[i].km
+      litros = 0
     }
   }
+  
+  return {
+    labels: itens.map(({ date }) => getFormattedLocaleDateString(date)),
+    data: itens.map(({ autonomia }) => autonomia.toFixed(2)),
+  }
+}
 
-  const labels = itens.map(({ date }) => getFormattedLocaleDateString(date))
-  const data = itens.map(({ autonomia }) => autonomia.toFixed(2))
-
-  return getObjectForCreatingChart(data, labels)
+function getInitialObjectForChart() {
+  return getObjectForCreatingChart({ ...getLabelsAndDataProps() })
 }
 
 export class GraficoAbastecimentos extends HTMLElement {
   #root
+  #obj
   #chart
-  #chartValues
-  #controller
-  #signal
-
+  
   constructor() {
     super()
-
-    this.#chartValues = getItemsForChart()
-    this.#controller = new AbortController()
-    this.#signal = { signal: this.#controller.signal }
+    this.#obj = getInitialObjectForChart()
   }
 
-  #getNewChart(canvas = null) {
-    return new Chart(canvas.getContext('2d'), { ...this.#chartValues })
+  #getNewChart() {
+    const canvas = this.#root.querySelector('canvas')
+    return new Chart(canvas.getContext('2d'), { ...this.#obj })
   }
 
   updateChart() {
-    this.#chartValues = getItemsForChart()
+    if (!this.#chart) {
+      this.#chart = this.#getNewChart()
+    }
+
+    const { labels, data } = getLabelsAndDataProps()
+
+    this.#chart.data.labels = labels
+    this.#chart.data.datasets[0].data = data
+
+    this.#chart.update()
   }
   
   // disconnectedCallback() {}
@@ -112,12 +127,10 @@ export class GraficoAbastecimentos extends HTMLElement {
   connectedCallback() {
     const clone = getCloneByTemplateId('#chart_template')
     
-    const canvas = clone.querySelector('canvas')
-    
     this.#root = this.attachShadow({ mode: 'open' })
     this.#root.append(clone)
 
-    this.#chart = this.#getNewChart(canvas)
+    this.updateChart()
   }
 }
 

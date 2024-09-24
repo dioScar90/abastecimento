@@ -14,7 +14,7 @@ export class RowAbastecimento extends HTMLTableRowElement {
     const template = document.createElement('template')
 
     const data = getFormattedLocaleDateString(date)
-    const quilometragem = getFormattedKm(km)
+    const quilometragem = km ? getFormattedKm(km) : '---'
     const quantidade = getFormattedLiters(liters)
     const completou = !isFull ? '---' : 'Completou'
 

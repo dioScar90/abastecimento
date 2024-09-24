@@ -56,10 +56,20 @@ export class TabelaAbastecimentos extends HTMLElement {
     trBefore.after(new RowAbastecimento(values))
     this.#updateChart()
   }
+  
+  removeTr = (id) => {
+    this.#getSpecificTr(id)?.remove()
+    this.#updateChart()
+  }
 
   #createChart() {
     this.#chart = new GraficoAbastecimentos()
     this.after(this.#chart)
+  }
+
+  #removeChart() {
+    this.#chart?.remove()
+    this.#chart = null
   }
 
   #updateItems() {
@@ -69,21 +79,16 @@ export class TabelaAbastecimentos extends HTMLElement {
   #updateChart() {
     this.#updateItems()
 
-    if (this.#items?.length) {
-      if (this.#chart) {
-        this.#chart.updateChart()
-      } else {
-        this.#createChart()
-      }
-    } else {
-      this.#chart?.remove()
-      this.#chart = null
+    if (!this.#items.length) {
+      this.#removeChart()
+      return
     }
-  }
-  
-  removeTr = (id) => {
-    this.#getSpecificTr(id)?.remove()
-    this.#updateChart()
+    
+    if (this.#chart) {
+      this.#chart.updateChart()
+    } else {
+      this.#createChart()
+    }
   }
   
   // disconnectedCallback() {}
