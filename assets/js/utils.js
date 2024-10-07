@@ -101,3 +101,8 @@ export function getNumberIntoFormattedDecimalStyle(value, threeDigits = false) {
   const options = { style: 'currency', currency: 'BRL', minimumFractionDigits: threeDigits ? 3 : 2 }
   return (value * (threeDigits ? 0.001 : 0.01)).toLocaleString('pt-BR', { ...options }).replace('R$', '').trim()
 }
+
+export function putCursorOnEndOfText(input) {
+  input.focus()
+  input.setSelectionRange(input.value.length, input.value.length)
+} 

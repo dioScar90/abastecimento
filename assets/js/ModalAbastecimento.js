@@ -1,14 +1,30 @@
 import { TABELA_ABASTECIMENTOS_NAME } from "./TabelaAbastecimentos.js"
-import { getCloneByTemplateId, getFormattedKm, getFormattedLiters, getItemFromStorage, getNumberIntoFormattedDecimalStyle, getOnlyNumbers, getTodayAsyyyyMMdd, removeItemFromStorage, setNewItemInStorage } from "./utils.js"
+import { getCloneByTemplateId, getFormattedKm, getFormattedLiters, getItemFromStorage, getNumberIntoFormattedDecimalStyle, getOnlyNumbers, getTodayAsyyyyMMdd, putCursorOnEndOfText, removeItemFromStorage, setNewItemInStorage } from "./utils.js"
 
 export const MODAL_ABASTECIMENTO_NAME = 'modal-abastecimento'
 
 function handleInputKm(e) {
-  e.currentTarget.value = getOnlyNumbers(e.currentTarget.value) || ''
+  const input = e.currentTarget
+  input.value = getOnlyNumbers(input.value) || ''
 }
 
-function handleInput(e) {
-  e.currentTarget.value = getNumberIntoFormattedDecimalStyle(e.currentTarget.value, e.currentTarget.name === 'liters')
+function handleInputLiters(e) {
+  const input = e.currentTarget
+
+  input.value = getNumberIntoFormattedDecimalStyle(input.value, input.name === 'liters')
+  putCursorOnEndOfText(input)
+}
+
+function handleInputIsFull(e) {
+  const input = e.currentTarget
+  const inputKm = input.form.elements.km
+
+  inputKm.toggleAttribute('required', input.checked)
+  inputKm.toggleAttribute('disabled', !input.checked)
+
+  if (inputKm.disabled) {
+    inputKm.value = null
+  }
 }
 
 function getTabelaAbastecimentos() {
@@ -38,7 +54,7 @@ function handleSubmit(e) {
     return
   }
 
-  values.km = +values.km.replace(',', '.')
+  values.km = values.km ? +values.km.replace(',', '.') : null
   values.liters = +values.liters.replace(',', '.')
   values.isFull = !!values.isFull
   
@@ -90,7 +106,7 @@ export class ModalAbastecimento extends HTMLElement {
     if (this.#options.id && this.#excluir) {
       inputId.value = this.#options.id
 
-      inputKm.value = getFormattedKm(this.#options.km, true)
+      inputKm.value = this.#options?.km ? getFormattedKm(this.#options.km, true) : '---'
       inputLiters.value = getFormattedLiters(this.#options.liters, true)
       inputIsFull.checked = !!this.#options?.isFull
       inputDate.value = this.#options.date
@@ -106,8 +122,8 @@ export class ModalAbastecimento extends HTMLElement {
     }
 
     inputKm.addEventListener('input', handleInputKm, { ...this.#signal })
-    inputLiters.addEventListener('input', handleInput, { ...this.#signal })
-    inputIsFull.addEventListener('change', e => inputLiters.toggleAttribute('required', e.currentTarget.checked), { ...this.#signal })
+    inputLiters.addEventListener('input', handleInputLiters, { ...this.#signal })
+    inputIsFull.addEventListener('change', handleInputIsFull, { ...this.#signal })
     
     form.addEventListener('keydown', handleEnterPress, { ...this.#signal })
     form.addEventListener('submit', handleSubmit, { ...this.#signal })

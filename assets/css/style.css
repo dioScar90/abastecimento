@@ -27,6 +27,11 @@ body > main {
   width: min(1000px, calc(100vw - 10px));
 }
 
+.cursor-pointer,
+::part(cursor-pointer) {
+  cursor: pointer;
+}
+
 button,
 ::part(btn) {
   cursor: pointer;
